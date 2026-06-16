@@ -23,3 +23,8 @@ This step sets up centralized monitoring and logging to maintain visibility into
    aws cloudformation deploy --template-file cloudwatch-alarms.yaml --stack-name CWAlarms \
      --parameter-overrides EC2InstanceId=<EC2_ID> DBInstanceId=<RDS_ID> \
      --capabilities CAPABILITY_NAMED_IAM
+
+2.Deploy Log Group for application logs:
+aws cloudformation deploy --template-file cloudwatch-log-group.yaml --stack-name CWLogGroup \
+  --parameter-overrides LogGroupName=<YourAppLogGroupName> \
+  --capabilities CAPABILITY_NAMED_IAM
