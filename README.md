@@ -1,18 +1,18 @@
 **Project Overview
 This project presents an end-to-end AWS architecture solution designed for scalability, security, and automation. It covers:**
 
-=> Multi-tier VPC with public/private subnets and secure routing
-=> Auto Scaling EC2 instances behind Application Load Balancers
-=> Managed relational databases with backups (RDS/Aurora)
-=> Hybrid cloud connectivity via VPN or Direct Connect
-=> Serverless real-time data analytics using Kinesis, Lambda, Glue, and Athena
-=> Automated security & compliance with IAM, Config, GuardDuty, WAF, and CloudTrail
-=> CI/CD pipelines integrating CodeCommit, CodeBuild, CodeDeploy, and CodePipeline
-=> Cost optimization using AWS Budgets
-=> Monitoring and centralized logging with CloudWatch
-=> Disaster recovery planning with cross-region backups
-=> Identity federation using AWS SSO or Active Directory
-=> API Gateway and Step Functions for microservices orchestration
+1. Multi-tier VPC with public/private subnets and secure routing
+2. Auto Scaling EC2 instances behind Application Load Balancers
+3. Managed relational databases with backups (RDS/Aurora)
+4. Hybrid cloud connectivity via VPN or Direct Connect
+5. Serverless real-time data analytics using Kinesis, Lambda, Glue, and Athena
+6. Automated security & compliance with IAM, Config, GuardDuty, WAF, and CloudTrail
+7. CI/CD pipelines integrating CodeCommit, CodeBuild, CodeDeploy, and CodePipeline
+8. Cost optimization using AWS Budgets
+9. Monitoring and centralized logging with CloudWatch
+10. Disaster recovery planning with cross-region backups
+11. Identity federation using AWS SSO or Active Directory
+12. API Gateway and Step Functions for microservices orchestration
 
 **Project Structure**
 
