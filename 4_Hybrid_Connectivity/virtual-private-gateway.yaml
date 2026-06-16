@@ -1,0 +1,28 @@
+#Creates Virtual Private Gateway and attaches to VPC.
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Virtual Private Gateway and attachment to VPC
+
+Parameters:
+  VpcId:
+    Type: String
+    Description: VPC ID to attach VGW
+
+Resources:
+  VirtualPrivateGateway:
+    Type: AWS::EC2::VPNGateway
+    Properties:
+      Type: ipsec.1
+      Tags:
+        - Key: Name
+          Value: SecureHybridVPGW
+
+  AttachVGW:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VpcId
+      VpnGatewayId: !Ref VirtualPrivateGateway
+
+Outputs:
+  VirtualPrivateGatewayId:
+    Description: VGW ID
+    Value: !Ref VirtualPrivateGateway
