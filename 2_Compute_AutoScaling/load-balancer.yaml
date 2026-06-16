@@ -1,0 +1,56 @@
+# Creates Application Load Balancer, Listener, Target Group linked to ASG.
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Application Load Balancer with Listener and Target Group
+
+Parameters:
+  VpcId:
+    Type: String
+    Description: VPC ID
+
+  PublicSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Public subnets for ALB
+
+Resources:
+
+  WebAlb:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: WebAppALB
+      Subnets: !Ref PublicSubnetIds
+      SecurityGroups: []  # Attach SG allowing 80, 443 for ALB
+      Scheme: internet-facing
+      Tags:
+        - Key: Name
+          Value: WebAppALB
+
+  WebAlbTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: WebAppTG
+      Port: 80
+      Protocol: HTTP
+      VpcId: !Ref VpcId
+      TargetType: instance
+      HealthCheckPath: /
+      Matcher:
+        HttpCode: 200
+
+  WebAlbListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref WebAlb
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref WebAlbTargetGroup
+
+Outputs:
+  ALBName:
+    Description: Application Load Balancer DNS Name
+    Value: !GetAtt WebAlb.DNSName
+
+  TargetGroupArn:
+    Description: Target Group ARN to attach to Auto Scaling Group
+    Value: !Ref WebAlbTargetGroup
