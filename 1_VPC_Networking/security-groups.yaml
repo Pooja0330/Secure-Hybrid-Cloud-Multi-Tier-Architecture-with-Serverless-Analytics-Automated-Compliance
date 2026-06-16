@@ -1,23 +1,18 @@
-Purpose: Create security groups for Web, App, and DB tiers to control network access between tiers.
-
-Key steps:
-
-Web SG: Allow HTTP(80) and HTTPS(443) from anywhere.
-App SG: Allow traffic from Web SG on port 8080 (example app port).
-DB SG: Allow traffic from App SG on port 3306 (MySQL port).
-
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Security groups for tiers
+Description: Security Groups for Web, App, Database tiers
 
 Parameters:
-  VpcId: {}
+  VpcId:
+    Type: String
+    Description: VPC ID from vpc-setup.yaml
 
 Resources:
+
   WebSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow HTTP/HTTPS from anywhere
       VpcId: !Ref VpcId
+      GroupDescription: Security group for Web tier - allows HTTP and HTTPS
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
@@ -27,25 +22,34 @@ Resources:
           FromPort: 443
           ToPort: 443
           CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: WebSG
 
   AppSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow app traffic from WebSG
       VpcId: !Ref VpcId
+      GroupDescription: Security group for App tier - allows traffic from Web SG
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 8080
           ToPort: 8080
           SourceSecurityGroupId: !Ref WebSG
+      Tags:
+        - Key: Name
+          Value: AppSG
 
-  DbSG:
+  DBSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow DB traffic from AppSG
       VpcId: !Ref VpcId
+      GroupDescription: Security group for Database tier - allows traffic from App SG
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 3306
           ToPort: 3306
           SourceSecurityGroupId: !Ref AppSG
+      Tags:
+        - Key: Name
+          Value: DBSG
