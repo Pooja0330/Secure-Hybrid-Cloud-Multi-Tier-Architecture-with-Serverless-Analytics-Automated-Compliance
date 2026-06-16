@@ -1,0 +1,26 @@
+#IAM Roles and Policies with least privilege examples
+AWSTemplateFormatVersion: '2010-09-09'
+Description: IAM roles and least privilege policies
+
+Resources:
+  EC2ReadOnlyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: EC2ReadOnlyRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ReadOnlyAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:Describe*
+                  - s3:GetObject
+                Resource: "*"
