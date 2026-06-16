@@ -1,0 +1,38 @@
+Creates Auto Scaling Group referencing launch template, defines scaling.
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Auto Scaling Group for EC2 Web App
+
+Parameters:
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Private subnet IDs for ASG
+
+  LaunchTemplateId:
+    Type: String
+    Description: Launch Template ID
+
+Resources:
+
+  WebAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      VPCZoneIdentifier: !Ref SubnetIds
+      LaunchTemplate:
+        LaunchTemplateId: !Ref LaunchTemplateId
+        Version: !GetAtt LaunchTemplate.LatestVersionNumber
+      MinSize: 2
+      MaxSize: 5
+      DesiredCapacity: 2
+      TargetGroupARNs: []  # Attach ALB target group ARN later, in load-balancer.yaml or manually
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: 300
+      Tags:
+        - Key: Name
+          Value: WebAppASG
+          PropagateAtLaunch: true
+
+Outputs:
+  AutoScalingGroupName:
+    Description: The Auto Scaling Group Name
+    Value: !Ref WebAutoScalingGroup
