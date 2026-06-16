@@ -1,0 +1,29 @@
+#Defines on-premises Customer Gateway for VPN.
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Customer Gateway representing on-premise network
+
+Parameters:
+  CustomerGatewayIP:
+    Type: String
+    Description: Public IP of on-premises VPN device
+
+  BgpAsn:
+    Type: Number
+    Default: 65000
+    Description: BGP ASN for on-premises device
+
+Resources:
+  CustomerGateway:
+    Type: AWS::EC2::CustomerGateway
+    Properties:
+      BgpAsn: !Ref BgpAsn
+      IpAddress: !Ref CustomerGatewayIP
+      Type: ipsec.1
+      Tags:
+        - Key: Name
+          Value: OnPremCustomerGateway
+
+Outputs:
+  CustomerGatewayId:
+    Description: Customer Gateway ID
+    Value: !Ref CustomerGateway
