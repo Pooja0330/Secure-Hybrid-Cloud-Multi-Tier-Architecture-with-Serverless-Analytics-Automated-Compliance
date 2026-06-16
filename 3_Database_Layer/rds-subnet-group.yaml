@@ -1,1 +1,23 @@
- 
+ #Defines RDS subnet group spanning private subnets.
+ AWSTemplateFormatVersion: '2010-09-09'
+Description: Database Subnet Group spanning private subnets
+
+Parameters:
+  PrivateSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Private subnet IDs for RDS
+
+Resources:
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: "Subnet group for RDS in private subnets"
+      SubnetIds: !Ref PrivateSubnetIds
+      Tags:
+        - Key: Name
+          Value: RDSSubnetGroup
+
+Outputs:
+  DBSubnetGroupName:
+    Description: The DB Subnet Group name
+    Value: !Ref DBSubnetGroup
