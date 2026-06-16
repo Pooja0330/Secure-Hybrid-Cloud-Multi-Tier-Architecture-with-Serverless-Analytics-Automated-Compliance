@@ -1,0 +1,22 @@
+#Create KMS keys for encrypting data in EBS, S3, RDS, and VPN tunnels.
+#Include key policies restricting usage and enabling automatic key rotation.
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: KMS Keys and key policy
+
+Resources:
+  MyKmsKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: 'KMS key for encrypting resources'
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action: 'kms:*'
+            Resource: '*'
+      Enabled: true
+      EnableKeyRotation: true
