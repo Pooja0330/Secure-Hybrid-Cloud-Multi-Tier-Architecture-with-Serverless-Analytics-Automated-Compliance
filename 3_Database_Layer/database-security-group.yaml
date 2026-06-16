@@ -1,0 +1,33 @@
+#Creates SG allowing inbound DB port only from App tier SG.
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Security Group for RDS allowing App tier access
+
+Parameters:
+  VpcId:
+    Type: String
+    Description: VPC ID
+
+  AppSecurityGroupId:
+    Type: String
+    Description: Security Group ID of App tier
+
+Resources:
+  DBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group for RDS DB access from App tier only
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !Ref AppSecurityGroupId
+      Tags:
+        - Key: Name
+          Value: DBSecurityGroup
+
+Outputs:
+  DBSecurityGroupId:
+    Description: Database Security Group ID
+    Value: !Ref DBSecurityGroup
