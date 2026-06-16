@@ -1,0 +1,2 @@
+#Define Network ACL rules controlling subnet inbound/outbound traffic.
+#Example: Allow HTTP/HTTPS, deny all traffic from suspicious IPs.
