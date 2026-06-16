@@ -1,0 +1,51 @@
+Creates EC2 Launch Template with instance details, AMI, key pair, security groups.
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: EC2 Launch Template for AutoScaling Group
+
+Parameters:
+  VpcId:
+    Type: String
+    Description: VPC ID
+
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Private subnets for ASG
+
+  WebSecurityGroupId:
+    Type: String
+    Description: Security Group ID for EC2 instances
+
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair
+
+Resources:
+
+  LaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: WebAppLaunchTemplate
+      LaunchTemplateData:
+        InstanceType: t3.micro
+        ImageId: ami-0c94855ba95c71c99  # Amazon Linux 2 AMI (update per region)
+        KeyName: !Ref KeyName
+        NetworkInterfaces:
+          - AssociatePublicIpAddress: false
+            DeleteOnTermination: true
+            DeviceIndex: 0
+            SubnetId: !Select [0, !Ref SubnetIds]
+            Groups:
+              - !Ref WebSecurityGroupId
+        IamInstanceProfile:
+          Name: EC2InstanceProfile  # Must be created separately or update accordingly
+        TagSpecifications:
+          - ResourceType: instance
+            Tags:
+              - Key: Name
+                Value: WebAppServer
+
+Outputs:
+  LaunchTemplateId:
+    Description: Launch Template ID
+    Value: !Ref LaunchTemplate
