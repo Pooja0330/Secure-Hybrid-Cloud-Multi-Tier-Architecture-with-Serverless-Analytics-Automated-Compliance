@@ -1,0 +1,54 @@
+#Creates an RDS instance with security, backup, multi-AZ as suitable.
+AWSTemplateFormatVersion: '2010-09-09'
+Description: RDS Instance in private subnets
+
+Parameters:
+  DBSubnetGroupName:
+    Type: String
+    Description: DB Subnet Group name from subnet group template
+
+  DBSecurityGroupId:
+    Type: String
+    Description: Security Group ID for database access
+
+  DBUsername:
+    NoEcho: true
+    Type: String
+    Description: Master DB username
+
+  DBPassword:
+    NoEcho: true
+    Type: String
+    Description: Master DB password
+
+Resources:
+  MyRDSInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: secure-hybrid-db
+      Engine: mysql
+      EngineVersion: "8.0"
+      DBInstanceClass: db.t3.medium
+      AllocatedStorage: 20
+      StorageType: gp2
+      MasterUsername: !Ref DBUsername
+      MasterUserPassword: !Ref DBPassword
+      VPCSecurityGroups:
+        - !Ref DBSecurityGroupId
+      DBSubnetGroupName: !Ref DBSubnetGroupName
+      MultiAZ: true
+      BackupRetentionPeriod: 7
+      PubliclyAccessible: false
+      DeletionProtection: true
+      Tags:
+        - Key: Name
+          Value: SecureHybridDB
+
+Outputs:
+  DBEndpoint:
+    Description: RDS Endpoint address
+    Value: !GetAtt MyRDSInstance.Endpoint.Address
+
+  DBInstanceId:
+    Description: RDS Instance Id
+    Value: !Ref MyRDSInstance
