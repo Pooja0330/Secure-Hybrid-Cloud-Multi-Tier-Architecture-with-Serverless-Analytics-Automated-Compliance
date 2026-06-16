@@ -26,3 +26,8 @@ Outputs:
   VirtualPrivateGatewayId:
     Description: VGW ID
     Value: !Ref VirtualPrivateGateway
+
+    #Deploy virtual-private-gateway.yaml to create and attach VGW:
+    aws cloudformation deploy --template-file virtual-private-gateway.yaml --stack-name VirtualPrivateGateway \
+  --parameter-overrides VpcId=<VPC_ID> \
+  --capabilities CAPABILITY_NAMED_IAM
