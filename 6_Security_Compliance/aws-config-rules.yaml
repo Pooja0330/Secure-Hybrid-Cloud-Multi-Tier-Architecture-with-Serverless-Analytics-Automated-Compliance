@@ -1,0 +1,27 @@
+#AWS Config rules to monitor compliance (e.g., ensure S3 buckets are encrypted, MFA on root accounts).
+#Enables continuous compliance checks and alerts.
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS Config Managed Rules
+
+Resources:
+  S3BucketEncryptedRule:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: s3-bucket-encrypted
+      Description: "Checks whether S3 buckets are encrypted"
+      Scope:
+        ComplianceResourceTypes:
+          - "AWS::S3::Bucket"
+      Source:
+        Owner: AWS
+        SourceIdentifier: S3_BUCKET_SERVER_SIDE_ENCRYPTION_ENABLED
+
+  RootAccountMfaEnabledRule:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: root-account-mfa-enabled
+      Description: "Checks whether MFA is enabled on the root account"
+      Source:
+        Owner: AWS
+        SourceIdentifier: ROOT_ACCOUNT_MFA_ENABLED
