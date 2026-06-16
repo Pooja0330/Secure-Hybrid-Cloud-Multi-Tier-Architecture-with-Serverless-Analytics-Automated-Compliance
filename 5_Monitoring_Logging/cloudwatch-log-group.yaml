@@ -1,0 +1,15 @@
+# Defines log group for centralizing application or system logs.
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudWatch Log Group for application/system logging
+
+Parameters:
+  LogGroupName:
+    Type: String
+    Description: Name of CloudWatch Log Group
+
+Resources:
+  AppLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Ref LogGroupName
+      RetentionInDays: 30
