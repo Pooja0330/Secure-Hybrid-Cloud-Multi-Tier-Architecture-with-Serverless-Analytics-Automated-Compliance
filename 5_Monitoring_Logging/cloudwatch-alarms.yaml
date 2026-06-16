@@ -1,0 +1,47 @@
+#Sample CloudFormation for CloudWatch Alarms on CPU high utilization for EC2 and RDS.
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudWatch Alarms for EC2 and RDS CPU utilization
+
+Parameters:
+  EC2InstanceId:
+    Type: String
+    Description: EC2 Instance ID to monitor
+
+  DBInstanceId:
+    Type: String
+    Description: RDS DB Instance Identifier
+
+Resources:
+  HighCPUAlarmEC2:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: "Alarm when EC2 CPU > 80%"
+      Namespace: AWS/EC2
+      MetricName: CPUUtilization
+      Dimensions:
+        - Name: InstanceId
+          Value: !Ref EC2InstanceId
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 80
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions: []
+      OKActions: []
+
+  HighCPUAlarmRDS:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: "Alarm when RDS CPU > 80%"
+      Namespace: AWS/RDS
+      MetricName: CPUUtilization
+      Dimensions:
+        - Name: DBInstanceIdentifier
+          Value: !Ref DBInstanceId
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 80
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions: []
+      OKActions: []
