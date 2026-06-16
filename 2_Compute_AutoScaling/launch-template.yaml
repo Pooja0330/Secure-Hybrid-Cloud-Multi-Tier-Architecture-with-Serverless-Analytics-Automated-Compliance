@@ -1,4 +1,4 @@
-Creates EC2 Launch Template with instance details, AMI, key pair, security groups.
+#Creates EC2 Launch Template with instance details, AMI, key pair, security groups.
 
 AWSTemplateFormatVersion: '2010-09-09'
 Description: EC2 Launch Template for AutoScaling Group
