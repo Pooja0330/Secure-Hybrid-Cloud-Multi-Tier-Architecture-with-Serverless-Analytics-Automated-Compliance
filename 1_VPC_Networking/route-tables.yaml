@@ -1,0 +1,55 @@
+Purpose: Setup route tables for public and private subnets and associate them.
+
+Key steps:
+
+Public Route Table with default route to IGW.
+Associate public route table with public subnet.
+Private Route Table with default route to NAT Gateway.
+Associate private route table with private subnet.
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Route tables for subnets
+
+Parameters:
+  VpcId: {}
+  PublicSubnetId: {}
+  PrivateSubnetId: {}
+  InternetGatewayId: {}
+  NatGatewayId: {}
+
+Resources:
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VpcId
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGatewayId
+
+  PublicSubnetAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetId
+      RouteTableId: !Ref PublicRouteTable
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VpcId
+
+  PrivateSubnetAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnetId
+      RouteTableId: !Ref PrivateRouteTable
+
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGatewayId
