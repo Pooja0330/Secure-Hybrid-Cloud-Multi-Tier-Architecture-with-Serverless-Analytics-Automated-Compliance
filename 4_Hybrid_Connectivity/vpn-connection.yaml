@@ -1,0 +1,45 @@
+#Creates VPN Connection between Customer Gateway and Virtual Private Gateway.
+AWSTemplateFormatVersion: '2010-09-09'
+Description: VPN connection between on-prem and AWS cloud
+
+Parameters:
+  CustomerGatewayId:
+    Type: String
+    Description: Customer Gateway ID
+
+  VirtualPrivateGatewayId:
+    Type: String
+    Description: Virtual Private Gateway ID
+
+  StaticRoutesOnly:
+    Type: String
+    AllowedValues: ["true", "false"]
+    Default: "false"
+    Description: Use static routes only?
+
+Resources:
+  VPNConnection:
+    Type: AWS::EC2::VPNConnection
+    Properties:
+      Type: ipsec.1
+      CustomerGatewayId: !Ref CustomerGatewayId
+      VpnGatewayId: !Ref VirtualPrivateGatewayId
+      StaticRoutesOnly: !Ref StaticRoutesOnly
+      Tags:
+        - Key: Name
+          Value: SecureHybridVPNConnection
+
+  VPNConnectionRoute:
+    Type: AWS::EC2::VPNConnectionRoute
+    Condition: UseStaticRoutes
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0  # Replace with on-prem CIDR if known
+      VpnConnectionId: !Ref VPNConnection
+
+Conditions:
+  UseStaticRoutes: !Equals [!Ref StaticRoutesOnly, "true"]
+
+Outputs:
+  VPNConnectionId:
+    Description: VPN Connection ID
+    Value: !Ref VPNConnection
