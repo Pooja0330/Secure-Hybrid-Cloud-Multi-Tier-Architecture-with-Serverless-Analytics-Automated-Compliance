@@ -43,3 +43,9 @@ Outputs:
   VPNConnectionId:
     Description: VPN Connection ID
     Value: !Ref VPNConnection
+
+    #Deploy vpn-connection.yaml passing Customer Gateway ID, VGW ID, and routing option:
+    aws cloudformation deploy --template-file vpn-connection.yaml --stack-name VPNConnection \
+  --parameter-overrides CustomerGatewayId=<CUSTOMER_GATEWAY_ID> VirtualPrivateGatewayId=<VPGW_ID> StaticRoutesOnly=false \
+  --capabilities CAPABILITY_NAMED_IAM
+    
