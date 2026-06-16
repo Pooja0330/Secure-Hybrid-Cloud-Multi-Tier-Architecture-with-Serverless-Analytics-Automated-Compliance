@@ -1,23 +1,24 @@
-Purpose: Create the VPC, public/private subnets, Internet Gateway (IGW), Elastic IP, and NAT Gateway.
-
-Key steps in this template:
-
-Define a VPC CIDR block (default 10.0.0.0/16).
-Create a public subnet with auto-assign public IPs.
-Create a private subnet for backend resources.
-Create and attach an Internet Gateway.
-Create an Elastic IP and NAT Gateway for outbound internet from private subnet.
-
-
 AWSTemplateFormatVersion: '2010-09-09'
-Description: VPC and networking foundation
+Description: VPC with public and private subnets, IGW, and NAT Gateway for multi-AZ
 
 Parameters:
   VpcCIDR:
+    Type: String
     Default: 10.0.0.0/16
+    Description: CIDR block for VPC
+
+Mappings:
+  AZMap:
+    us-east-1a:
+      PublicSubnetCIDR: 10.0.1.0/24
+      PrivateSubnetCIDR: 10.0.2.0/24
+    us-east-1b:
+      PublicSubnetCIDR: 10.0.3.0/24
+      PrivateSubnetCIDR: 10.0.4.0/24
 
 Resources:
-  MyVPC:
+
+  VPC:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: !Ref VpcCIDR
@@ -25,45 +26,112 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: SecureHybrid-VPC
-
-  PublicSubnet1:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref MyVPC
-      CidrBlock: 10.0.1.0/24
-      MapPublicIpOnLaunch: true
-      AvailabilityZone: !Select [0, !GetAZs '']
-
-  PrivateSubnet1:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref MyVPC
-      CidrBlock: 10.0.2.0/24
-      MapPublicIpOnLaunch: false
-      AvailabilityZone: !Select [0, !GetAZs '']
+          Value: SecureHybridCloudVPC
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
         - Key: Name
-          Value: SecureHybrid-IGW
+          Value: SecureHybridCloudIGW
 
   AttachIGW:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
-      VpcId: !Ref MyVPC
+      VpcId: !Ref VPC
       InternetGatewayId: !Ref InternetGateway
 
+  # Public Subnet 1
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !FindInMap [AZMap, us-east-1a, PublicSubnetCIDR]
+      AvailabilityZone: us-east-1a
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: PublicSubnet-A
+
+  # Private Subnet 1
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !FindInMap [AZMap, us-east-1a, PrivateSubnetCIDR]
+      AvailabilityZone: us-east-1a
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: PrivateSubnet-A
+
+  # Public Subnet 2
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !FindInMap [AZMap, us-east-1b, PublicSubnetCIDR]
+      AvailabilityZone: us-east-1b
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: PublicSubnet-B
+
+  # Private Subnet 2
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !FindInMap [AZMap, us-east-1b, PrivateSubnetCIDR]
+      AvailabilityZone: us-east-1b
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: PrivateSubnet-B
+
+  # Elastic IP for NAT Gateway in AZ1
   NatEIP1:
     Type: AWS::EC2::EIP
     DependsOn: AttachIGW
     Properties:
       Domain: vpc
 
+  # NAT Gateway 1 in Public Subnet 1
   NatGateway1:
     Type: AWS::EC2::NatGateway
     Properties:
       AllocationId: !GetAtt NatEIP1.AllocationId
       SubnetId: !Ref PublicSubnet1
+      Tags:
+        - Key: Name
+          Value: NAT-Gateway-A
+
+  # Elastic IP for NAT Gateway in AZ2
+  NatEIP2:
+    Type: AWS::EC2::EIP
+    DependsOn: AttachIGW
+    Properties:
+      Domain: vpc
+
+  # NAT Gateway 2 in Public Subnet 2
+  NatGateway2:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatEIP2.AllocationId
+      SubnetId: !Ref PublicSubnet2
+      Tags:
+        - Key: Name
+          Value: NAT-Gateway-B
+
+Outputs:
+  VPCId:
+    Description: VPC Id
+    Value: !Ref VPC
+
+  PublicSubnet1Id:
+    Description: Public subnet 1 ID
+    Value: !Ref PublicSubnet1
+
+  PrivateSubnet1Id:
+    Description: Private subnet 1 ID
+    Value: !Ref PrivateSubnet1
