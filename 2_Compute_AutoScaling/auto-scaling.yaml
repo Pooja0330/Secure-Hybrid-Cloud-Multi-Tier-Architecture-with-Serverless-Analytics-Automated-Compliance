@@ -1,4 +1,4 @@
-Creates Auto Scaling Group referencing launch template, defines scaling.
+#Creates Auto Scaling Group referencing launch template, defines scaling.
 
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Auto Scaling Group for EC2 Web App
